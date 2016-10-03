@@ -53,16 +53,16 @@ module InitialIso {a}{b}(C : Cat {a}{b}) where
 
  init-iden : (I : Obj){init : Initial C I}
            → i init {I} ≅ iden {I}
- init-iden I = {!!}
+ init-iden I {init = init₁} = law init₁
 
 
 --------------------------------------------------
  {- Probar que un objeto terminal es inicial en la categoría dual y viceversa -}
  TerminalInitialDuality : {X : Obj} → Terminal C X → Initial (C Op) X
- TerminalInitialDuality = {!!}
+ TerminalInitialDuality (term t law) = init t law
 
  InitialTerminalDuality : {X : Obj} → Initial C X → Terminal (C Op) X
- InitialTerminalDuality = {!!}
+ InitialTerminalDuality (init i law) = term i law
 
 --------------------------------------------------
 
@@ -73,19 +73,36 @@ module InitialIso {a}{b}(C : Cat {a}{b}) where
             → (p : Initial C I)
             → (q : Initial C I')
             → Iso C (i p {I'})
- InitialIso I I' p q = {!!}
+ InitialIso I I' p q = iso-op (TerminalIso (C Op) 
+                                           I 
+                                           I' 
+                                           (InitialTerminalDuality p) 
+                                           (InitialTerminalDuality q))  
+                 
+                
 
 --------------------------------------------------------
 -- Probar que los coproductos son productos en la categoría dual
 ProductCoproductDuality : ∀{a}{b}{C : Cat {a}{b}}
                         → Products C
                         → Coproducts (C Op)
-ProductCoproductDuality = {!!}
+ProductCoproductDuality (prod _×_ 
+                              π₁ π₂
+                              ⟨_,_⟩ 
+                              law1 
+                              law2 
+                              law3) = coproduct _×_ 
+                                                π₁ 
+                                                π₂ 
+                                                ⟨_,_⟩ 
+                                                law1 
+                                                law2 
+                                                law3
 
 CoproductProductDuality : ∀{a}{b}{C : Cat {a}{b}}
                         → Coproducts C
                         → Products (C Op)
-CoproductProductDuality = {!!}
+CoproductProductDuality (coproduct _+_ inl inr [_,_] law1 law2 law3) = prod _+_ inl inr [_,_] law1 law2 law3
 
 --------------------------------------------------
 module CoproductIso {a}{b}(C : Cat {a}{b})  where
@@ -98,7 +115,7 @@ module CoproductIso {a}{b}(C : Cat {a}{b})  where
 
   {- Probar que los coproductos son únicos hasta un isomorfismo *usando dualidad* -}
   CoproductIso : ∀{A B}(X Y : Coproducts C) → Iso C ([_,_] X {A} {B} (inl Y) (inr Y))
-  CoproductIso X Y = {!!}
+  CoproductIso X Y = iso-op (piso (CoproductProductDuality X) (CoproductProductDuality Y))
 
 --------------------------------------------------
 
@@ -109,18 +126,43 @@ module CoproductMorphisms {a}{b}{C : Cat {a}{b}}{cp : Coproducts C} where
 
   {- Definir el siguiente morfismo -}
   plus : ∀{A B C D}(f : Hom A B)(g : Hom C D) → Hom (A + C) (B + D)
-  plus f g = {!!}
+  plus f g = [(inl ∙ f) , (inr ∙ g)]
 
   {- Probar las siguentes propiedades -}
 
   idplus : ∀{A B} → plus (iden {A}) (iden {B}) ≅ iden {A + B}
-  idplus = {!!}
+  idplus {A} {B} = proof plus iden iden 
+                        ≅⟨ refl ⟩
+                        [(inl ∙ iden) , (inr ∙ iden)]
+                        ≅⟨ cong₂ [_,_] idr idr ⟩
+                        [ inl , inr ]
+                        ≅⟨ sym (law3 idl idl) ⟩
+                        iden ∎
 
   idcomp :  ∀{A B C D E F}
          → (f : Hom B C)(g : Hom A B)
          → (h : Hom E F)(i : Hom D E)
          → plus (f ∙ g) (h ∙ i) ≅ plus f h ∙ plus g i
-  idcomp  f g h i = {!!}
+  idcomp  f g h i = proof plus (f ∙ g) (h ∙ i) 
+                          ≅⟨ refl ⟩
+                          [(inl ∙ (f ∙ g)) , (inr ∙ (h ∙ i))] 
+                          ≅⟨ sym (law3 
+                                 (proof 
+                                 ([ inl ∙ f , inr ∙ h ] ∙ [ inl ∙ g , inr ∙ i ]) ∙ inl 
+                                 ≅⟨ ass ⟩
+                                 [ inl ∙ f , inr ∙ h ] ∙ ([ inl ∙ g , inr ∙ i ] ∙ inl)
+                                 ≅⟨ cong₂ _∙_ refl law1 ⟩
+                                 [ inl ∙ f , inr ∙ h ] ∙ inl ∙ g
+                                 ≅⟨ sym ass ⟩
+                                 ([ inl ∙ f , inr ∙ h ] ∙ inl) ∙ g
+                                 ≅⟨ cong₂ _∙_ law1 refl ⟩
+                                 (inl ∙ f) ∙ g
+                                 ≅⟨ ass ⟩
+                                 inl ∙ f ∙ g ∎) 
+                                 {!!}) ⟩
+                          [(inl ∙ f) , (inr ∙ h)] ∙ [(inl ∙ g) , (inr ∙ i)]
+                          ≅⟨ refl ⟩
+                          plus f h ∙ plus g i ∎
 
    {- Probar que _+_ junto con plus definen unFunctor C ×C C → C -}
 
