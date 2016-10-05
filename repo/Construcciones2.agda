@@ -159,13 +159,32 @@ module CoproductMorphisms {a}{b}{C : Cat {a}{b}}{cp : Coproducts C} where
                                  (inl ∙ f) ∙ g
                                  ≅⟨ ass ⟩
                                  inl ∙ f ∙ g ∎) 
-                                 {!!}) ⟩
+                                 (proof 
+                                 ([ inl ∙ f , inr ∙ h ] ∙ [ inl ∙ g , inr ∙ i ]) ∙ inr 
+                                 ≅⟨ ass ⟩
+                                 [ inl ∙ f , inr ∙ h ] ∙ [ inl ∙ g , inr ∙ i ] ∙ inr
+                                 ≅⟨ cong₂ _∙_ refl law2 ⟩
+                                 [ inl ∙ f , inr ∙ h ] ∙ inr ∙ i
+                                 ≅⟨ sym ass ⟩
+                                 ([ inl ∙ f , inr ∙ h ] ∙ inr) ∙ i
+                                 ≅⟨ cong₂ _∙_ law2 refl ⟩
+                                 (inr ∙ h) ∙ i
+                                 ≅⟨ ass ⟩
+                                 inr ∙ h ∙ i ∎)) ⟩
                           [(inl ∙ f) , (inr ∙ h)] ∙ [(inl ∙ g) , (inr ∙ i)]
                           ≅⟨ refl ⟩
                           plus f h ∙ plus g i ∎
 
-   {- Probar que _+_ junto con plus definen unFunctor C ×C C → C -}
+   {- Probar que _+_ junto con plus definen unFunctor C xC C → C -}
 
+  open import Functors
+  open import Categories.ProductCat
+
+  plusCoProdIsFunctor : Fun (C ×C C) C
+  plusCoProdIsFunctor = functor (λ {(x , y) → x + y}) 
+                                (λ {(f , g) → plus f g}) 
+                                idplus 
+                                (λ { {X} {Y} {Z} {(f , g)} {(h , i)} → idcomp f h g i }) 
 
 module Intercambio {a}{b}{C : Cat {a}{b}}{cp : Coproducts C}{p : Products C} where
 
@@ -180,4 +199,33 @@ module Intercambio {a}{b}{C : Cat {a}{b}}{cp : Coproducts C}{p : Products C} whe
          → (f : Hom A C)(g : Hom B C)
          → (h : Hom A D)(k : Hom B D)
          → ⟨ [ f , g ] , [ h , k ] ⟩ ≅ [ ⟨ f , h ⟩ , ⟨ g , k ⟩ ]
-  intercambio f g h i = {!!}
+  intercambio f g h k = proof ⟨ [ f , g ] , [ h , k ] ⟩ 
+                              ≅⟨  law3 (lawp3 (proof π₁ ∙ ⟨ [ f , g ] , [ h , k ] ⟩ ∙ inl 
+                                                     ≅⟨ sym ass ⟩
+                                                     (π₁ ∙ ⟨ [ f , g ] , [ h , k ] ⟩) ∙ inl
+                                                     ≅⟨ cong₂ _∙_ lawp1 refl ⟩
+                                                     [ f , g ] ∙ inl
+                                                     ≅⟨ law1 ⟩
+                                                     f ∎) 
+                                              (proof π₂ ∙ ⟨ [ f , g ] , [ h , k ] ⟩ ∙ inl 
+                                                     ≅⟨ sym ass ⟩
+                                                     (π₂ ∙ ⟨ [ f , g ] , [ h , k ] ⟩) ∙ inl
+                                                     ≅⟨ cong₂ _∙_ lawp2 refl ⟩
+                                                     [ h , k ] ∙ inl
+                                                     ≅⟨ law1 ⟩
+                                                     h ∎)) 
+                                       (lawp3 (proof π₁ ∙ ⟨ [ f , g ] , [ h , k ] ⟩ ∙ inr 
+                                                     ≅⟨ sym ass ⟩
+                                                     (π₁ ∙ ⟨ [ f , g ] , [ h , k ] ⟩) ∙ inr
+                                                     ≅⟨ cong₂ _∙_ lawp1 refl ⟩
+                                                     [ f , g ] ∙ inr
+                                                     ≅⟨ law2 ⟩
+                                                     g ∎) 
+                                              (proof π₂ ∙ ⟨ [ f , g ] , [ h , k ] ⟩ ∙ inr
+                                                     ≅⟨ sym ass ⟩
+                                                      (π₂ ∙ ⟨ [ f , g ] , [ h , k ] ⟩) ∙ inr
+                                                     ≅⟨ cong₂ _∙_ lawp2 refl ⟩
+                                                     [ h , k ] ∙ inr
+                                                     ≅⟨ law2 ⟩
+                                                     k ∎)) ⟩
+                              [ ⟨ f , h ⟩ , ⟨ g , k ⟩ ] ∎
