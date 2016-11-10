@@ -24,6 +24,13 @@ record Cat {a b} : Set (lsuc (a ⊔ b)) where
   conglr : ∀{X Y Z}{ f g : Hom X Y}{h k : Hom Y Z} → (p : h ≅ k) → (q : f ≅ g) → h ∙ f ≅ k ∙ g
   conglr p q = cong₂ _∙_ p q
 
+  symIden : ∀{X Y}(f : Hom X Y) → (_∙_ iden f ≅ _∙_ f iden)
+  symIden h = proof iden ∙ h
+                    ≅⟨ idl ⟩
+                    h
+                    ≅⟨ sym idr ⟩
+                    h ∙ iden ∎
+
 
 
 open Cat
