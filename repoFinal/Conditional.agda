@@ -28,6 +28,8 @@ open import Categories.Products.Properties hasProducts
 
 open Initial hasInitial
 
+-- Ahora en una categoría distributiva podemos definir una función condicional
+-- Definimos el tipo Bool como:
 Bool = T + T
 
 true : Hom T Bool
@@ -46,11 +48,27 @@ module CisDistributive (isDistr : Distributive)  where
 
  open Distributive isDistr
 
+-- El condicional se forma a partir de una flecha p: A \-> Bool la cual nos permite definir la siguiente flecha:
  cond : ∀{A} → Hom A Bool → Hom A (A + A) 
  cond p = copair unit unit ∙ distr ∙ ⟨ iden , p ⟩
+ 
+ -- Se puede ver como el siguiente diagrama conmuta:
+ --                  \<id, p\>
+ --         A ----------------------> A x Bool (T + T)
+ --         |                           |
+ -- cond p  |                           | distr
+ --         |                           |
+ --         v                           v
+ --       A + A <------------------- A x T + A x T
+ 
+ 
+ -- Entonces definimos la función condicional que dependiendo de p, elige f o g como resultado
  _⇒_,_ : ∀{A B} → Hom A Bool → Hom A B → Hom A B → Hom A B 
  p ⇒ f , g = [ f , g ] ∙ cond p
 
+ -- Y podemos probar algunas propiedades como:
+ -- Es distributiva a izquierda
+ 
  leftDistr : ∀{A B D} → (p : Hom A Bool) → (f : Hom A B) → (g : Hom A B) → (h : Hom B D) → h ∙ (p ⇒ f , g) ≅ p ⇒ (h ∙ f) , (h ∙ g)
  leftDistr p f g h = proof h ∙ (p ⇒ f , g)
                            ≅⟨ sym ass ⟩
@@ -59,6 +77,8 @@ module CisDistributive (isDistr : Distributive)  where
                            [ h ∙ f , h ∙ g ] ∙ cond p
                            ≅⟨ refl ⟩ 
                            (p ⇒ h ∙ f , (h ∙ g)) ∎
+                           
+  -- Es distributiva a derecha
 
  rightDistr : ∀{A B D} → (p : Hom A Bool) → (f : Hom A B) → (g : Hom A B) → (h : Hom D A) → (p ⇒ f , g) ∙ h ≅ (p ∙ h) ⇒ (f ∙ h) , (g ∙ h)
  rightDistr p f g h = proof p ⇒ f , g ∙ h
@@ -68,22 +88,22 @@ module CisDistributive (isDistr : Distributive)  where
                             [ f , g ] ∙ copair unit unit ∙ (distr ∙ ⟨ iden , p ⟩) ∙ h
                             ≅⟨ congr (congr ass) ⟩
                             [ f , g ] ∙ copair unit unit ∙ distr ∙ ⟨ iden , p ⟩ ∙ h
-                            ≅⟨ congr (congr (congr fusion)) ⟩
+                            ≅⟨ congr (congr (congr fusion)) ⟩  -- Metemos la h dentro del producto
                             [ f , g ] ∙ copair unit unit ∙ distr ∙ ⟨ iden ∙ h , p ∙ h ⟩
-                            ≅⟨ congr (congr (congr (cong₂ ⟨_,_⟩ (symIden h) (sym idl)))) ⟩
+                            ≅⟨ congr (congr (congr (cong₂ ⟨_,_⟩ (symIden h) (sym idl)))) ⟩  -- Damos vuelta
                             [ f , g ] ∙ copair unit unit ∙ distr ∙ ⟨ h ∙ iden , iden ∙ p ∙ h ⟩
-                            ≅⟨ congr (congr (congr (sym fusion-pair))) ⟩
+                            ≅⟨ congr (congr (congr (sym fusion-pair))) ⟩ -- sacamos el h x iden afuera
                             [ f , g ] ∙
                               copair unit unit ∙ distr ∙ pair h iden ∙ ⟨ iden , p ∙ h ⟩ 
-                            ≅⟨ congr (congr (congr (congl (cong₂ pair refl (sym iden-cop))))) ⟩
+                            ≅⟨ congr (congr (congr (congl (cong₂ pair refl (sym iden-cop))))) ⟩ -- Hacemos aparecer id + id ya que es lo mismo que id
                             [ f , g ] ∙
-                              copair unit unit ∙
+                              copair unit unit ∙  -- Aca abajo!
                               distr ∙ pair h (copair iden iden) ∙ ⟨ iden , p ∙ h ⟩
                             ≅⟨ congr (congr (sym ass)) ⟩
                             [ f , g ] ∙
                               copair unit unit ∙
                               (distr ∙ pair h (copair iden iden)) ∙ ⟨ iden , p ∙ h ⟩
-                            ≅⟨ congr (congr (congl (natDistr h iden iden))) ⟩
+                            ≅⟨ congr (congr (congl (natDistr h iden iden))) ⟩  -- Usamos la natDistr que decia distr ∙ (pair f (copair g h)) ≅ (copair (pair f g) (pair f h)) ∙ distr
                             [ f , g ] ∙
                               copair unit unit ∙
                               (copair (pair h iden) (pair h iden) ∙ distr) ∙ ⟨ iden , p ∙ h ⟩
@@ -95,13 +115,13 @@ module CisDistributive (isDistr : Distributive)  where
                             [ f , g ] ∙
                               ((copair unit unit ∙ copair (pair h iden) (pair h iden)) ∙ distr) ∙
                               ⟨ iden , p ∙ h ⟩
-                            ≅⟨ congr (congl (congl (sym comp-cop))) ⟩
+                            ≅⟨ congr (congl (congl (sym comp-cop))) ⟩ -- Composición de copairs
                             [ f , g ] ∙
                               (copair (unit ∙ pair h iden) (unit ∙ pair h iden) ∙ distr) ∙
                               ⟨ iden , p ∙ h ⟩
-                            ≅⟨ congr (congl (congl (cong₂ copair π₁-pair π₁-pair))) ⟩
+                            ≅⟨ congr (congl (congl (cong₂ copair π₁-pair π₁-pair))) ⟩  -- recordando que unit = \pi\_1
                             [ f , g ] ∙ (copair (h ∙ unit) (h ∙ unit) ∙ distr) ∙ ⟨ iden , p ∙ h ⟩
-                            ≅⟨ congr (congl (congl comp-cop)) ⟩
+                            ≅⟨ congr (congl (congl comp-cop)) ⟩ -- Composición de copairs al revez
                             [ f , g ] ∙
                               ((copair h h ∙ copair unit unit) ∙ distr) ∙ ⟨ iden , p ∙ h ⟩
                             ≅⟨ congr (congl ass) ⟩
@@ -113,15 +133,14 @@ module CisDistributive (isDistr : Distributive)  where
                             ≅⟨ congr (congr ass) ⟩
                             [ f , g ] ∙
                               copair h h ∙ copair unit unit ∙ distr ∙ ⟨ iden , p ∙ h ⟩
-                            ≅⟨ congr (congr refl) ⟩
+                            ≅⟨ congr (congr refl) ⟩ -- definición de cond
                             [ f , g ] ∙
                               copair h h ∙ cond (p ∙ h)
                             ≅⟨ sym ass ⟩
                             ([ f , g ] ∙ copair h h) ∙ cond (p ∙ h)
                             ≅⟨ congl fusion-cop ⟩
                             [ f ∙ h , g ∙ h ] ∙ cond (p ∙ h)
-
-                            ≅⟨ refl ⟩
+                            ≅⟨ refl ⟩ -- reescritura
                             (p ∙ h) ⇒ f ∙ h , (g ∙ h) ∎
 
  lemma1 : [ iden , iden ] ∙ distr ≅ iden
@@ -134,6 +153,9 @@ module CisDistributive (isDistr : Distributive)  where
                 {!!}
                 ≅⟨ {!!} ⟩
                 iden ∎
+                
+ -- Si tenemos la misma flecha en ambos casos de la elección, el condicional nos devuelve esa flecha
+ 
  same : ∀{A B} → (p : Hom A Bool) → (f : Hom A B) → p ⇒ f , f ≅ f
  same p f = proof p ⇒ f , f
                   ≅⟨ refl ⟩
@@ -142,13 +164,13 @@ module CisDistributive (isDistr : Distributive)  where
                   ([ f , f ] ∙ copair unit unit) ∙ distr ∙ ⟨ iden , p ⟩
                   ≅⟨ congl fusion-cop ⟩
                   [ f ∙ unit , f ∙ unit ] ∙ distr ∙ ⟨ iden , p ⟩
-                  ≅⟨ congl (cong₂ [_,_] (sym π₁-pair) (sym π₁-pair)) ⟩
+                  ≅⟨ congl (cong₂ [_,_] (sym π₁-pair) (sym π₁-pair)) ⟩ -- hacemos aparecer los f x id
                   [ unit ∙ pair f iden , unit ∙ pair f iden ] ∙ distr ∙ ⟨ iden , p ⟩
                   ≅⟨ congl (sym fusionCo) ⟩
-                  (unit ∙ [ pair f iden , pair f iden ]) ∙ distr ∙ ⟨ iden , p ⟩
+                  (unit ∙ [ pair f iden , pair f iden ]) ∙ distr ∙ ⟨ iden , p ⟩ -- sacamos unit afuera del coproducto
                   ≅⟨ ass ⟩
                   unit ∙ [ pair f iden , pair f iden ] ∙ distr ∙ ⟨ iden , p ⟩
-                  ≅⟨ congr (congl (cong₂ [_,_] (sym idl) (sym idl))) ⟩
+                  ≅⟨ congr (congl (cong₂ [_,_] (sym idl) (sym idl))) ⟩ hacemos aparecer id dentro del coproducto
                   unit ∙
                     [ iden ∙ pair f iden , iden ∙ pair f iden ] ∙ distr ∙ ⟨ iden , p ⟩
                   ≅⟨ congr (congl (sym fusion-cop)) ⟩
@@ -159,15 +181,15 @@ module CisDistributive (isDistr : Distributive)  where
                   unit ∙
                     [ iden , iden ] ∙
                     copair (pair f iden) (pair f iden) ∙ distr ∙ ⟨ iden , p ⟩
-                  ≅⟨ congr (congr (sym ass)) ⟩
+                  ≅⟨ congr (congr (sym ass)) ⟩ -- nos queda preparado para usar la naturalidad de distr
                   unit ∙
                     [ iden , iden ] ∙
                     (copair (pair f iden) (pair f iden) ∙ distr) ∙ ⟨ iden , p ⟩
-                  ≅⟨ congr (congr (congl (sym (natDistr f iden iden)))) ⟩
+                  ≅⟨ congr (congr (congl (sym (natDistr f iden iden)))) ⟩ -- usamos natDistr
                   unit ∙
                     [ iden , iden ] ∙
                     (distr ∙ pair f (copair iden iden)) ∙ ⟨ iden , p ⟩
-                  ≅⟨ congr (congr (congl (congr (cong₂ pair refl iden-cop)))) ⟩
+                  ≅⟨ congr (congr (congl (congr (cong₂ pair refl iden-cop)))) ⟩ -- id + id = id
                   unit ∙ [ iden , iden ] ∙ (distr ∙ pair f iden) ∙ ⟨ iden , p ⟩
                   ≅⟨ congr (congr ass) ⟩
                   unit ∙ [ iden , iden ] ∙ distr ∙ pair f iden ∙ ⟨ iden , p ⟩
