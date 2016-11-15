@@ -25,15 +25,15 @@ open Initial hasInitial
 
 --------------------------------------------------
 -- Vamos a definir categorías distributivas, estas son las categorías que teniendo productos y coproductos se pueden definir los siguientes isomorfismos naturales
--- A x (B + C) \cong (A x B) + (A x C)
--- A x 0 \cong 0
+-- A x (B + C) ≅ (A x B) + (A x C)
+-- A x 0 ≅  0
 -- Pero para ello necesitamos que existan los morfismos
--- undistr: (A x B) + (A x C) \-> A x (B + C)
--- distr:   A x (B + C) \-> (A x B) + (A x C) 
--- unnull:  0 \-> A x 0
--- null:    A x 0 -> 0
+-- undistr: (A x B) + (A x C) →  A x (B + C)
+-- distr:   A x (B + C) →  (A x B) + (A x C) 
+-- unnull:  0 →  A x 0
+-- null:    A x 0 →  0
 
--- y que undistr \. distr \cong distr \. undistr \cong id lo mismo con null y unnull
+-- y que undistr ∙ distr ≅ distr ∙ undistr ≅ id ; lo mismo con null y unnull
 
 -- Defino undistr y unnull ya que son mas simples.
 
@@ -49,10 +49,10 @@ undistr : ∀{X Y Z} → Hom (X × Y + X × Z) (X × (Y + Z))
 undistr = [ pair iden inl , pair iden inr ]
 
 -- Con esta definición podemos probar que para cualquier flechas 
--- f: A -> X, 
--- g: B -> Y, 
--- h: D -> Z
--- (f x (g + h)) . undistr = undistr . ((f x g) + (f x h))
+-- f: A → X, 
+-- g: B →  Y, 
+-- h: D →  Z
+-- (f x (g + h)) ∙ undistr = undistr ∙ ((f x g) + (f x h))
 
 natUnDistr : ∀{A B D X Y Z}(f : Hom A X)(g : Hom B Y)(h : Hom D Z) → (pair f (copair g h)) ∙ undistr ≅ undistr ∙ (copair (pair f g) (pair f h))
 natUnDistr {A} {B} {D} {X} {Y} {Z} f g h = proof
@@ -62,26 +62,26 @@ natUnDistr {A} {B} {D} {X} {Y} {Z} f g h = proof
                    ≅⟨ fusionCo ⟩  -- h ∙ [ f , g ] ≅ [ h ∙ f , h ∙ g ]
                    [ pair f (copair g h) ∙ pair iden inl ,
                      pair f (copair g h) ∙ pair iden inr ]
-                   ≅⟨ cong₂ [_,_] (proof pair f (copair g h) ∙ pair iden inl  -- prueba (f x (g + h)) . (id x inl) = (id x inl) (f x g)
+                   ≅⟨ cong₂ [_,_] (proof pair f (copair g h) ∙ pair iden inl  -- prueba (f x (g + h)) ∙ (id x inl) = (id x inl) (f x g)
                                          ≅⟨ refl ⟩  -- def pair
                                           pair f (copair g h) ∙ ⟨ iden ∙ π₁ , inl ∙ π₂ ⟩
-                                         ≅⟨ congr (cong₂ ⟨_,_⟩ idl refl) ⟩ -- id . f = f 
+                                         ≅⟨ congr (cong₂ ⟨_,_⟩ idl refl) ⟩ -- id ∙ f = f 
                                          pair f (copair g h) ∙ ⟨ π₁ , inl ∙ π₂ ⟩
                                          ≅⟨ fusion-pair ⟩  --  (f x g) ∙ ⟨ h , i ⟩ ≅ ⟨ f ∙ h , g ∙ i ⟩
                                          ⟨ f ∙ π₁ , copair g h ∙ inl ∙ π₂ ⟩
                                          ≅⟨ cong₂ ⟨_,_⟩ refl (sym ass) ⟩
                                          ⟨ f ∙ π₁ , (copair g h ∙ inl) ∙ π₂ ⟩
-                                         ≅⟨ cong₂ ⟨_,_⟩ refl (congl inl-cop) ⟩  -- (g + h) . inl = inl . g
+                                         ≅⟨ cong₂ ⟨_,_⟩ refl (congl inl-cop) ⟩  -- (g + h) ∙ inl = inl ∙  g
                                          ⟨ f ∙ π₁ , (inl ∙ g) ∙ π₂ ⟩
                                          ≅⟨ refl ⟩  -- def pair
                                          pair f (inl ∙ g) 
-                                         ≅⟨ cong₂ pair (sym idl) refl ⟩ -- f = f . id
+                                         ≅⟨ cong₂ pair (sym idl) refl ⟩ -- f = f ∙ id
                                          pair (iden ∙ f) (inl ∙ g)
-                                         ≅⟨ comp-pair ⟩  -- (f . g) x (h . j) = f x h . g x j
+                                         ≅⟨ comp-pair ⟩  -- (f ∙ g) x (h ∙ j) = f x h ∙ g x j
                                          pair iden inl ∙ pair f g ∎
 
                                   )
-                                  (proof pair f (copair g h) ∙ pair iden inr  -- prueba (f x (g + h)) . (id x inr) = (id x inr) . (f x h)
+                                  (proof pair f (copair g h) ∙ pair iden inr  -- prueba (f x (g + h)) ∙ (id x inr) = (id x inr) ∙ (f x h)
                                          ≅⟨ refl ⟩
                                          pair f (copair g h) ∙ ⟨ iden ∙ π₁ , inr ∙ π₂ ⟩
                                          ≅⟨ congr (cong₂ ⟨_,_⟩ idl refl) ⟩
@@ -125,7 +125,7 @@ record Distributive : Set (a ⊔ b) where
   natDistr f g h = proof distr ∙ pair f (copair g h)
                          ≅⟨ sym idr ⟩      -- hacemos aparecer una iden a la derecha
                          (distr ∙ pair f (copair g h)) ∙ iden
-                         ≅⟨ congr (sym (Iso.rinv distribute)) ⟩  -- undistr \. distr = id
+                         ≅⟨ congr (sym (Iso.rinv distribute)) ⟩  -- undistr ∙ distr = id
                          (distr ∙ pair f (copair g h)) ∙ undistr ∙ distr
                          ≅⟨ sym ass ⟩
                          ((distr ∙ pair f (copair g h)) ∙ undistr) ∙ distr
@@ -135,7 +135,7 @@ record Distributive : Set (a ⊔ b) where
                          (distr ∙ undistr ∙ copair (pair f g) (pair f h)) ∙ distr
                          ≅⟨ congl (sym ass) ⟩
                          ((distr ∙ undistr) ∙ copair (pair f g) (pair f h)) ∙ distr
-                         ≅⟨ congl (congl (Iso.linv distribute)) ⟩  -- distr \. undistr = id    
+                         ≅⟨ congl (congl (Iso.linv distribute)) ⟩  -- distr ∙ undistr = id    
                          (iden ∙ copair (pair f g) (pair f h)) ∙ distr
                          ≅⟨ congl idl ⟩
                          copair (pair f g) (pair f h) ∙ distr ∎
