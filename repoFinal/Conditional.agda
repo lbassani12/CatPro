@@ -163,11 +163,7 @@ module CisDistributive (isDistr : Distributive)  where
                                              ∙ distr
                                            ≅⟨ congl (cong₂ [_,_] (cong₂ pair idr (Coproducts.law1 hasCoproducts)) (cong₂ pair idr (Coproducts.law2 hasCoproducts))) ⟩
                                            [ pair f g , pair f h ] ∙ distr ∎ 
- lemma1 : ∀{X} → [ iden {X} , iden {X} ] ≅ iden {X}
- lemma1 = proof [ iden , iden ]
-                ≅⟨ {!!} ⟩
-                iden ∎
- 
+  
  -- Si tenemos la misma flecha en ambos casos de la elección, el condicional nos devuelve esa flecha
  
  same : ∀{A B} → (p : Hom A Bool) → (f : Hom A B) → p ⇒ f , f ≅ f
@@ -190,7 +186,7 @@ module CisDistributive (isDistr : Distributive)  where
                   unit ∙ pair f [ iden , iden ] ∙ ⟨ iden , p ⟩
                   ≅⟨ congr (fusion-pair) ⟩
                   unit ∙ ⟨ f ∙ iden , [ iden , iden ] ∙ p ⟩
-                  ≅⟨ congr (cong₂ ⟨_,_⟩ idr (congl {!lemma1!})) ⟩
+                  ≅⟨ congr (cong₂ ⟨_,_⟩ idr refl) ⟩ -- da lo mismo lo que este a la derecha del ⟨_,_⟩ 
                   unit ∙ ⟨ f , (_) ⟩
                   ≅⟨ Products.law1 hasProducts ⟩ -- ya que unit = π₁
                   f ∎ 
