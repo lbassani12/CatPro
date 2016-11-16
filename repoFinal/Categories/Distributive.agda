@@ -56,53 +56,92 @@ undistr = [ pair iden inl , pair iden inr ]
 
 natUnDistr : ∀{A B D X Y Z}(f : Hom A X)(g : Hom B Y)(h : Hom D Z) → (pair f (copair g h)) ∙ undistr ≅ undistr ∙ (copair (pair f g) (pair f h))
 natUnDistr {A} {B} {D} {X} {Y} {Z} f g h = proof
-                   pair f (copair g h) ∙ undistr
-                   ≅⟨ refl ⟩      -- definición de undistr
-                    pair f (copair g h) ∙ [ pair iden inl , pair iden inr ]
-                   ≅⟨ fusionCo ⟩  -- h ∙ [ f , g ] ≅ [ h ∙ f , h ∙ g ]
-                   [ pair f (copair g h) ∙ pair iden inl ,
-                     pair f (copair g h) ∙ pair iden inr ]
-                   ≅⟨ cong₂ [_,_] (proof pair f (copair g h) ∙ pair iden inl  -- prueba (f x (g + h)) ∙ (id x inl) = (id x inl) (f x g)
-                                         ≅⟨ refl ⟩  -- def pair
-                                          pair f (copair g h) ∙ ⟨ iden ∙ π₁ , inl ∙ π₂ ⟩
-                                         ≅⟨ congr (cong₂ ⟨_,_⟩ idl refl) ⟩ -- id ∙ f = f 
-                                         pair f (copair g h) ∙ ⟨ π₁ , inl ∙ π₂ ⟩
-                                         ≅⟨ fusion-pair ⟩  --  (f x g) ∙ ⟨ h , i ⟩ ≅ ⟨ f ∙ h , g ∙ i ⟩
-                                         ⟨ f ∙ π₁ , copair g h ∙ inl ∙ π₂ ⟩
-                                         ≅⟨ cong₂ ⟨_,_⟩ refl (sym ass) ⟩
-                                         ⟨ f ∙ π₁ , (copair g h ∙ inl) ∙ π₂ ⟩
-                                         ≅⟨ cong₂ ⟨_,_⟩ refl (congl inl-cop) ⟩  -- (g + h) ∙ inl = inl ∙  g
-                                         ⟨ f ∙ π₁ , (inl ∙ g) ∙ π₂ ⟩
-                                         ≅⟨ refl ⟩  -- def pair
-                                         pair f (inl ∙ g) 
-                                         ≅⟨ cong₂ pair (sym idl) refl ⟩ -- f = f ∙ id
-                                         pair (iden ∙ f) (inl ∙ g)
-                                         ≅⟨ comp-pair ⟩  -- (f ∙ g) x (h ∙ j) = f x h ∙ g x j
-                                         pair iden inl ∙ pair f g ∎
+           pair f (copair g h) ∙ undistr
 
-                                  )
-                                  (proof pair f (copair g h) ∙ pair iden inr  -- prueba (f x (g + h)) ∙ (id x inr) = (id x inr) ∙ (f x h)
-                                         ≅⟨ refl ⟩
-                                         pair f (copair g h) ∙ ⟨ iden ∙ π₁ , inr ∙ π₂ ⟩
-                                         ≅⟨ congr (cong₂ ⟨_,_⟩ idl refl) ⟩
-                                         pair f (copair g h) ∙ ⟨ π₁ , inr ∙ π₂ ⟩
-                                         ≅⟨ fusion-pair ⟩
-                                         ⟨ f ∙ π₁ , copair g h ∙ inr ∙ π₂ ⟩
+                   ≅⟨ refl ⟩      -- definición de undistr
+
+           pair f (copair g h) ∙ [ pair iden inl , pair iden inr ]
+
+                   ≅⟨ fusionCo ⟩  -- h ∙ [ f , g ] ≅ [ h ∙ f , h ∙ g ]
+
+           [ pair f (copair g h) ∙ pair iden inl ,
+             pair f (copair g h) ∙ pair iden inr ]
+
+               ≅⟨ cong₂ [_,_] (proof pair f (copair g h) ∙ pair iden inl  -- prueba (f x (g + h)) ∙ (id x inl) = (id x inl) (f x g)
+
+                                         ≅⟨ refl ⟩  -- def pair
+
+                                  pair f (copair g h) ∙ ⟨ iden ∙ π₁ , inl ∙ π₂ ⟩
+
+                                         ≅⟨ congr (cong₂ ⟨_,_⟩ idl refl) ⟩ -- id ∙ f = f 
+
+                                  pair f (copair g h) ∙ ⟨ π₁ , inl ∙ π₂ ⟩
+
+                                         ≅⟨ fusion-pair ⟩  --  (f x g) ∙ ⟨ h , i ⟩ ≅ ⟨ f ∙ h , g ∙ i ⟩
+
+                                  ⟨ f ∙ π₁ , copair g h ∙ inl ∙ π₂ ⟩
+
                                          ≅⟨ cong₂ ⟨_,_⟩ refl (sym ass) ⟩
-                                         ⟨ f ∙ π₁ , (copair g h ∙ inr) ∙ π₂ ⟩
-                                         ≅⟨ cong₂ ⟨_,_⟩ refl (congl inr-cop) ⟩
-                                         ⟨ f ∙ π₁ , (inr ∙ h) ∙ π₂ ⟩
+
+                                  ⟨ f ∙ π₁ , (copair g h ∙ inl) ∙ π₂ ⟩
+
+                                         ≅⟨ cong₂ ⟨_,_⟩ refl (congl inl-cop) ⟩  -- (g + h) ∙ inl = inl ∙  g
+
+                                  ⟨ f ∙ π₁ , (inl ∙ g) ∙ π₂ ⟩
+
+                                         ≅⟨ refl ⟩  -- def pair
+
+                                  pair f (inl ∙ g) 
+
+                                         ≅⟨ cong₂ pair (sym idl) refl ⟩ -- f = f ∙ id
+
+                                  pair (iden ∙ f) (inl ∙ g)
+
+                                         ≅⟨ comp-pair ⟩  -- (f ∙ g) x (h ∙ j) = f x h ∙ g x j
+
+                                  pair iden inl ∙ pair f g ∎)
+
+                            (proof pair f (copair g h) ∙ pair iden inr  -- prueba (f x (g + h)) ∙ (id x inr) = (id x inr) ∙ (f x h)
+
                                          ≅⟨ refl ⟩
-                                         pair f (inr ∙ h)
+
+                                  pair f (copair g h) ∙ ⟨ iden ∙ π₁ , inr ∙ π₂ ⟩
+
+                                         ≅⟨ congr (cong₂ ⟨_,_⟩ idl refl) ⟩
+
+                                  pair f (copair g h) ∙ ⟨ π₁ , inr ∙ π₂ ⟩
+
+                                         ≅⟨ fusion-pair ⟩
+
+                                  ⟨ f ∙ π₁ , copair g h ∙ inr ∙ π₂ ⟩
+
+                                         ≅⟨ cong₂ ⟨_,_⟩ refl (sym ass) ⟩
+
+                                  ⟨ f ∙ π₁ , (copair g h ∙ inr) ∙ π₂ ⟩
+
+                                         ≅⟨ cong₂ ⟨_,_⟩ refl (congl inr-cop) ⟩
+
+                                  ⟨ f ∙ π₁ , (inr ∙ h) ∙ π₂ ⟩
+
+                                         ≅⟨ refl ⟩
+
+                                  pair f (inr ∙ h)
+
                                          ≅⟨ cong₂ pair (sym idl) refl ⟩
-                                         pair (iden ∙ f) (inr ∙ h)
+
+                                  pair (iden ∙ f) (inr ∙ h)
+                                                                
                                          ≅⟨ comp-pair ⟩
-                                         pair iden inr ∙ pair f h ∎) ⟩
-                   [ pair iden inl ∙ pair f g , pair iden inr ∙ pair f h ]
-                   ≅⟨ sym fusion-cop ⟩ -- usando [ h , i ] ∙ (f + g) ≅ [ h ∙ f , i ∙ g ]
+
+                                  pair iden inr ∙ pair f h ∎) ⟩
+
+             [ pair iden inl ∙ pair f g , pair iden inr ∙ pair f h ]
+
+                  ≅⟨ sym fusion-cop ⟩ -- usando [ h , i ] ∙ (f + g) ≅ [ h ∙ f , i ∙ g ]
                                        -- nos queda [id x inl, id x inr] . ((f x g) + (f x h)) y por la def de undistr
                                        -- undistr . ((f x g) + (f x h))
-                   undistr ∙ copair (pair f g) (pair f h) ∎
+
+             undistr ∙ copair (pair f g) (pair f h) ∎
 
 -- definimos unnull
 unnull : ∀{X} → Hom I (X × I)
@@ -123,19 +162,35 @@ record Distributive : Set (a ⊔ b) where
 
   natDistr : ∀{A B D X Y Z}(f : Hom A X)(g : Hom B Y)(h : Hom D Z) → distr ∙ (pair f (copair g h)) ≅ (copair (pair f g) (pair f h)) ∙ distr
   natDistr f g h = proof distr ∙ pair f (copair g h)
+
                          ≅⟨ sym idr ⟩      -- hacemos aparecer una iden a la derecha
-                         (distr ∙ pair f (copair g h)) ∙ iden
+
+                   (distr ∙ pair f (copair g h)) ∙ iden
+
                          ≅⟨ congr (sym (Iso.rinv distribute)) ⟩  -- undistr ∙ distr = id
-                         (distr ∙ pair f (copair g h)) ∙ undistr ∙ distr
+
+                   (distr ∙ pair f (copair g h)) ∙ undistr ∙ distr
+
                          ≅⟨ sym ass ⟩
-                         ((distr ∙ pair f (copair g h)) ∙ undistr) ∙ distr
+                                    
+                   ((distr ∙ pair f (copair g h)) ∙ undistr) ∙ distr
+
                          ≅⟨ congl ass ⟩
-                         (distr ∙ (pair f (copair g h) ∙ undistr)) ∙ distr
+
+                   (distr ∙ (pair f (copair g h) ∙ undistr)) ∙ distr
+
                          ≅⟨ congl (congr (natUnDistr f g h)) ⟩    -- Usamos la naturalidad de undistr anteriormente probada
-                         (distr ∙ undistr ∙ copair (pair f g) (pair f h)) ∙ distr
+
+                   (distr ∙ undistr ∙ copair (pair f g) (pair f h)) ∙ distr
+
                          ≅⟨ congl (sym ass) ⟩
-                         ((distr ∙ undistr) ∙ copair (pair f g) (pair f h)) ∙ distr
+
+                   ((distr ∙ undistr) ∙ copair (pair f g) (pair f h)) ∙ distr
+
                          ≅⟨ congl (congl (Iso.linv distribute)) ⟩  -- distr ∙ undistr = id    
-                         (iden ∙ copair (pair f g) (pair f h)) ∙ distr
+
+                   (iden ∙ copair (pair f g) (pair f h)) ∙ distr
+
                          ≅⟨ congl idl ⟩
-                         copair (pair f g) (pair f h) ∙ distr ∎
+
+                   copair (pair f g) (pair f h) ∙ distr ∎
